@@ -1,0 +1,41 @@
+version: '3'
+services:
+
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:latest
+    restart: always
+    container_name: es
+    volumes:
+      - es:/usr/share/elasticsearch/data
+      - type: bind
+        source: ./etc/elasticsearch/elasticsearch.yml
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+      - ./etc/elasticsearch/plugins:/usr/share/elasticsearch/plugins
+      #  - ./etc/elasticsearch/dict:/usr/share/elasticsearch/dict:rw
+    #user: "elasticsearch:root"
+    environment:
+      - TZ=Asia/Shanghai
+      - "ES_JAVA_OPTS=-Xms8G -Xmx8G"
+      - ES_CLUSTERNAME=es
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=02290ee1-06ca-c694-3f02-456854a80df6
+    ports:
+      - '9200:9200'     #java、集群通信端口
+      - '9300:9300'     #http通信端口
+
+  kibana:
+    image: kibana:7.5.2
+    restart: always
+    container_name: kibana
+    environment:
+      - TZ=Asia/Shanghai
+      - ELASTICSEARCH_HOSTS=http://es:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=02290ee1-06ca-c694-3f02-456854a80df6
+    ports:
+      - '5601:5601'
+
+volumes:
+  es:
+    driver: local
+  elasticsearch:
